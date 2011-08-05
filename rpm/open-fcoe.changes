@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug  5 17:20:32 CEST 2011 - hare@suse.de
+
+- Update to version 1.0.20
+- Move init script to runlevel boot (bnc#710594)
+- Rearrange package to build from git tree
+
+-------------------------------------------------------------------
 Mon Aug  1 10:59:19 CEST 2011 - hare@suse.de
 
 - Require lldpad and libhbalinux2 (bnc#705631)
