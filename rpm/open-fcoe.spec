@@ -30,14 +30,8 @@ Version:        1.0.19.1107011030
 Release:        0.<RELEASE7>
 Summary:        Open-FCoE userspace management tools
 #the upstream source is available as - fcoe-utils-2.6.39.tar.gz
-Source0:        http://www.open-fcoe.org/openfc/fcoe-utils-1.0.19.tar.bz2
-Source20:       mkinitrd-boot.sh
-Source22:       mkinitrd-setup.sh
-Patch0:         fcoe-utils-git-update
-Patch1:         fcoe-utils-init-script-fixup
-Patch2:         fcoe-utils-fcoe-setup-update-for-fipvlan
-Patch5:         fipvlan-configurable-ifname-suffix
-Patch6:         fcoe-utils-fixup-makefile
+Source0:        http://www.open-fcoe.org/openfc/fcoe-utils-2.6.39.tar.bz2
+Patch0:         fcoe-utils-sles11-sp2.diff.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -51,14 +45,8 @@ Authors:
     Robert Love <robert.w.love@intel.com>
 
 %prep
-%setup -q -n fcoe-utils-1.0.19
+%setup -q -n fcoe-utils-2.6.39
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
 
 %build
 autoreconf --install
@@ -67,13 +55,14 @@ make %{?_smp_mflags}
 
 %install
 %makeinstall
+mv ${RPM_BUILD_ROOT}/etc/init.d/fcoe ${RPM_BUILD_ROOT}/etc/init.d/boot.fcoe
 install -d ${RPM_BUILD_ROOT}/sbin
 install -m 755 contrib/fcoe-setup.sh ${RPM_BUILD_ROOT}/sbin/fcoe-setup
 install -d ${RPM_BUILD_ROOT}/lib/mkinitrd/scripts/
 install -m 755 rpm/mkinitrd-boot.sh ${RPM_BUILD_ROOT}/lib/mkinitrd/scripts/boot-fcoe.sh
 install -m 755 rpm/mkinitrd-setup.sh ${RPM_BUILD_ROOT}/lib/mkinitrd/scripts/setup-fcoe.sh
 mkdir -p ${RPM_BUILD_ROOT}/usr/sbin
-ln -s /etc/init.d/fcoe ${RPM_BUILD_ROOT}/usr/sbin/rcfcoe
+ln -s /etc/init.d/boot.fcoe ${RPM_BUILD_ROOT}/usr/sbin/rcfcoe
 install -d ${RPM_BUILD_ROOT}/usr/share/fcoe/scripts/
 install -m 755 contrib/fcc.sh ${RPM_BUILD_ROOT}/usr/share/fcoe/scripts/fcc.sh
 install -m 755 contrib/fcoe_edd.sh ${RPM_BUILD_ROOT}/usr/share/fcoe/scripts/fcoe_edd.sh
@@ -82,14 +71,14 @@ install -m 755 debug/fcoedump.sh ${RPM_BUILD_ROOT}/usr/share/fcoe/scripts/fcoedu
 
 %post
 [ -x /sbin/mkinitrd_setup ] && mkinitrd_setup
-%{fillup_and_insserv fcoe}
+%{fillup_and_insserv boot.fcoe}
 
 %preun
-%{stop_on_removal fcoe} 
+%{stop_on_removal boot.fcoe} 
 
 %postun
 [ -x /sbin/mkinitrd_setup ] && mkinitrd_setup
-%{insserv_cleanup fcoe}
+%{insserv_cleanup boot.fcoe}
 
 %files
 %defattr(-,root,root,-)
@@ -102,10 +91,9 @@ install -m 755 debug/fcoedump.sh ${RPM_BUILD_ROOT}/usr/share/fcoe/scripts/fcoedu
 %dir %{_sysconfdir}/fcoe
 %config(noreplace) %{_sysconfdir}/fcoe/config
 %config(noreplace) %{_sysconfdir}/fcoe/cfg-ethx
-%config(noreplace) %{_sysconfdir}/init.d/fcoe
+%config(noreplace) %{_sysconfdir}/init.d/boot.fcoe
 /lib/mkinitrd
 %config %{_sysconfdir}/bash_completion.d/fcoeadm
 %config %{_sysconfdir}/bash_completion.d/fcoemon
-/usr/sbin/rcfcoe
 
 %changelog

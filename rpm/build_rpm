@@ -5,8 +5,9 @@
 
 RPM="open-fcoe"
 BRANCH="sles11-sp2"
-BASEVER="0.9.43"
-BASETAG="v$BASEVER"
+BASENAME="fcoe-utils"
+BASEVER="2.6.39"
+BASETAG="v2.6.39"
 DESTDIR=
 TMPDIR=
 OBS_PRJ=SUSE:SLE-11-SP2:GA
@@ -111,9 +112,9 @@ if [ -n "$use_osc" ] ; then
     popd
 fi
 
-git archive --format=tar --prefix=$RPM-$VERSION/ "$BASETAG" \
-    | bzip2 > $DESTDIR/$RPM-$VERSION.tar.bz2
-git diff $BASETAG..$BRANCH | bzip2 > $DESTDIR/$RPM-$VERSION-$BRANCH.diff.bz2
+git archive --format=tar --prefix=$BASENAME-$BASEVER/ "$BASETAG" \
+    | bzip2 > $DESTDIR/$BASENAME-$BASEVER.tar.bz2
+git diff $BASETAG..$BRANCH | bzip2 > $DESTDIR/$BASENAME-$BRANCH.diff.bz2
 
 git show $BRANCH:rpm/$RPM.spec > $DESTDIR/$RPM.spec
 git show $BRANCH:rpm/$RPM.changes > $DESTDIR/$RPM.changes
