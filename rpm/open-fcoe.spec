@@ -36,8 +36,6 @@ Source22:       mkinitrd-setup.sh
 Patch0:         fcoe-utils-git-update
 Patch1:         fcoe-utils-init-script-fixup
 Patch2:         fcoe-utils-fcoe-setup-update-for-fipvlan
-Patch3:         fcoe-utils-modify-fcoemon-to-use-lldpad-abstract-soc
-Patch4:         fcoemon-Small-fixes-for-abstract-sockets
 Patch5:         fipvlan-configurable-ifname-suffix
 Patch6:         fcoe-utils-fixup-makefile
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -72,8 +70,8 @@ make %{?_smp_mflags}
 install -d ${RPM_BUILD_ROOT}/sbin
 install -m 755 contrib/fcoe-setup.sh ${RPM_BUILD_ROOT}/sbin/fcoe-setup
 install -d ${RPM_BUILD_ROOT}/lib/mkinitrd/scripts/
-install -m 755 %{S:20} ${RPM_BUILD_ROOT}/lib/mkinitrd/scripts/boot-fcoe.sh
-install -m 755 %{S:22} ${RPM_BUILD_ROOT}/lib/mkinitrd/scripts/setup-fcoe.sh
+install -m 755 rpm/mkinitrd-boot.sh ${RPM_BUILD_ROOT}/lib/mkinitrd/scripts/boot-fcoe.sh
+install -m 755 rpm/mkinitrd-setup.sh ${RPM_BUILD_ROOT}/lib/mkinitrd/scripts/setup-fcoe.sh
 mkdir -p ${RPM_BUILD_ROOT}/usr/sbin
 ln -s /etc/init.d/fcoe ${RPM_BUILD_ROOT}/usr/sbin/rcfcoe
 install -d ${RPM_BUILD_ROOT}/usr/share/fcoe/scripts/
