@@ -72,7 +72,7 @@ install-data-hook:
 	if [ ! -f ${DESTDIR}${fcoe_configdir}/config ] ; then \
 		cp ${srcdir}/etc/config ${DESTDIR}${fcoe_configdir}/config; \
 	fi; \
-	if [ ! -d "${BASH_COMPLETION_DIR}" ] ; then \
-		mkdir ${BASH_COMPLETION_DIR}; \
+	if [ ! -d "${DESTDIR}${BASH_COMPLETION_DIR}" ] ; then \
+		mkdir ${DESTDIR}${BASH_COMPLETION_DIR}; \
 	fi; \
-	cp -f ${srcdir}/contrib/bash_completion/* ${BASH_COMPLETION_DIR}
+	cp -f ${srcdir}/contrib/bash_completion/* ${DESTDIR}${BASH_COMPLETION_DIR}
