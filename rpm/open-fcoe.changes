@@ -1,0 +1,258 @@
+-------------------------------------------------------------------
+Mon Aug  1 10:59:19 CEST 2011 - hare@suse.de
+
+- Require lldpad and libhbalinux2 (bnc#705631)
+- Add scripts from contrib and debug directory (bnc#575211)
+
+-------------------------------------------------------------------
+Tue Jul 26 11:59:40 CEST 2011 - hare@suse.de
+
+- Make fipvlan suffix configurable (bnc#657959)
+
+-------------------------------------------------------------------
+Fri Jul  1 09:32:49 UTC 2011 - jankit@suse.de
+
+- Add files missed in the previous update 
+
+-------------------------------------------------------------------
+Fri Jul  1 08:46:44 UTC 2011 - jankit@suse.de
+
+- fcoe-utils-git-update: Add more patches from upstream HEAD as on
+  Jul 1 2011:
+
+  * 248d76b fcoemon: Clean up init scripts
+  * d9d8973 fcoeadm: Support multiple values for PortSpeed/PortSupportedSpeed
+  * 8b5b43e fcoe-utils: Read fcoemon pid file in a safe manner
+  * 50cc285 fcoe-utils: Fix ct_rjt_reason()
+  * 562c734 fcoemon: Add IEEE support
+  * 6611cc0 fcoemon: Add string array support
+  * aef23b9 fcoemon: Add includes required for IEEE support
+
+  References: https://bugzilla.novell.com/show_bug.cgi?id=692400
+
+-------------------------------------------------------------------
+Wed Jun 29 10:20:55 UTC 2011 - jankit@suse.de
+
+- Updating the source to git HEAD/master.
+  The tarball was generated with git-archive for v1.0.19 git tag.
+  And fcoe-utils-git-update patch contains commits since v1.0.19
+  till the HEAD on Jun 24 2011:
+
+   * 9a8f717 fcoeadm: Remove an useless loop (cleanup)
+   * 82d19d3 fcoeadm: show usage when no arguments are supplied
+   * 3a61cae fipvlan: fix formatting of help text
+   * d7b9a02 fcoemon: restart vlan discovery on HBA_EVENT_LIP_RESET_OCCURRED
+   * 7d9261c fcoemon: adds fcm_find_port_by_host to locate fcoe_port by host number
+   * b423b6a fcoemon: add fchost to fcoe_port to locate fcoe_port fc event
+   * 8f00bc6 fcoemon: receive and parse fc netlink events
+   * e7e5286 fcoe-utils: scsi netlink header files- 
+
+-------------------------------------------------------------------
+Tue Mar  1 15:13:26 CET 2011 - hare@suse.de
+
+- Add explicit version requirement for lldpad
+
+-------------------------------------------------------------------
+Tue Dec  7 10:39:12 CET 2010 - hare@suse.de
+
+- Add option '-f' to fipvlan
+
+-------------------------------------------------------------------
+Thu Dec  2 13:37:28 CET 2010 - hare@suse.de
+
+- Modify fcoemon to use abstract sockets (bnc#651609)
+- Enabling DCB and FCoE during initrd run (bnc#646531)
+
+-------------------------------------------------------------------
+Tue Sep  7 11:43:28 CEST 2010 - hare@suse.de
+
+- Fix fipvlan hang when link state changes (bnc#627765)
+- FIP VLAN discovery doesn't work on cable swap (bnc#632688)
+
+-------------------------------------------------------------------
+Mon May 10 18:02:18 CEST 2010 - hare@suse.de
+
+- Fix EMC SAN MAC issue (bnc#603964)
+
+-------------------------------------------------------------------
+Mon Apr 26 14:12:43 CEST 2010 - hare@suse.de
+
+- fixes no lun display issue due to wrong check for target role
+  (bnc#599421)
+
+-------------------------------------------------------------------
+Thu Apr  8 10:36:53 CEST 2010 - hare@suse.de
+
+- Resync with open-fcoe for RC3 (bnc#594212)
+
+-------------------------------------------------------------------
+Thu Mar 25 13:36:12 CET 2010 - hare@suse.de
+
+- More fipvlan fixes for RC2 (bnc#590324)
+- Update mkinitrd script to actually boot the system (bnc#590868)
+
+-------------------------------------------------------------------
+Tue Mar 23 14:12:30 CET 2010 - hare@suse.de
+
+- Sync-up package with git tree for RC2 (bnc#590324)
+- Compile against lldpad (bnc#590487)
+
+-------------------------------------------------------------------
+Mon Mar 15 13:50:54 CET 2010 - hare@suse.de
+
+- Sync-up package with commit id
+  9403c2aaac0b79d0d236ef9413cc88b7d6f7f04e (bnc#588150)
+
+-------------------------------------------------------------------
+Sun Mar 14 11:59:25 CET 2010 - ro@suse.de
+
+- finally fix build 
+
+-------------------------------------------------------------------
+Sat Mar 13 17:31:15 CET 2010 - ro@suse.de
+
+- fix typo in specfile 
+
+-------------------------------------------------------------------
+Fri Mar  5 10:47:03 CET 2010 - hare@suse.de
+
+- Add option '-i' to fipvlan (bnc#585045)
+- Add setup script /sbin/fcoe-setup (bnc#585045)
+
+-------------------------------------------------------------------
+Mon Feb 22 15:25:30 CET 2010 - hare@suse.de
+
+- Fixup mkinitrd scripts (bnc#570643)
+
+-------------------------------------------------------------------
+Mon Feb 22 12:12:58 CET 2010 - hare@suse.de
+
+- Sync-up package with git tree (bnc#581550)
+
+-------------------------------------------------------------------
+Fri Jan 22 08:56:46 CET 2010 - hare@suse.de
+
+- Sync-up package with git commit id
+  3f25915a92c308c5db352a7fe24092350498f179 (bnc#572686)
+- fcoemon uses memcpy when copying path name (bnc#572893)
+
+-------------------------------------------------------------------
+Thu Jan 14 14:23:54 CET 2010 - hare@suse.de
+
+- Reverse mkinitrd script naming (bnc#570643)
+
+-------------------------------------------------------------------
+Mon Jan 11 13:11:25 CET 2010 - hare@suse.de
+
+- Sync-up package for git tree (bnc#569508)
+
+-------------------------------------------------------------------
+Thu Dec 17 14:09:42 CET 2009 - hare@suse.de
+
+- Add commands to issue create,destroy,reset from fcoeadm
+  through fcoemon (bnc#557495)
+
+-------------------------------------------------------------------
+Fri Dec  4 12:15:21 CET 2009 - hare@suse.de
+
+- Update utilities with latest bugfixes (bnc#557495)
+- Requires dcbd and libhbalinux2 for correct operation.
+
+-------------------------------------------------------------------
+Mon Nov 23 00:59:42 CET 2009 - ro@suse.de
+
+- change buildreq to dcbd to fix build 
+
+-------------------------------------------------------------------
+Mon Nov 16 14:00:57 CET 2009 - hare@suse.de
+
+- Update to version 1.0.8 (FATE#306854)
+
+-------------------------------------------------------------------
+Wed Nov 11 09:36:28 CET 2009 - mcihar@suse.cz
+
+- added mkinitrd support for booting FCoE (FATE#307444)
+
+-------------------------------------------------------------------
+Mon Feb 23 11:27:04 CET 2009 - sf@suse.de
+
+- added Quickstart.SLES (bnc #478582)
+  to document SLES specifics 
+
+-------------------------------------------------------------------
+Wed Feb 11 10:49:19 CET 2009 - sf@suse.de
+
+- corrected open-fcoe-bug-473116-fix-library-path.diff
+  wrong library in /etc/hba.conf (bnc #473116) 
+
+-------------------------------------------------------------------
+Mon Feb  9 14:56:21 CET 2009 - sf@suse.de
+
+- add bug-473627_0001-fcoemon-service-fcoe-status-display-is-incorrect.patch
+  (bnc #473627)
+- add bug-473628_0002-fcoeadm-Incorrectly-checking-return-value-of-strstr.patch
+  (bnc #473628) 
+- add open-fcoe-bug-473116-fix-library-path.diff
+  (bnc #473116)
+- add bug-473630_0003-fcoemon-Incorrectly-calling-SA_LOG_ERR.patch
+  (bnc #473630)
+- add bug-473127_0004-fcoemon-dcbd-starts-after-fcoe-starts-fcoemon-will.patch
+  (bnc #473127)
+- add bug-473631_0005-fcoemon-Put-back-the-FCD_SEND_CONF-state.patch
+  (bnc #473631)
+
+-------------------------------------------------------------------
+Sat Jan 24 17:11:37 CET 2009 - sf@suse.de
+
+- rediffed open-fcoe-update-1.0.4.diff
+- rediffed open-fcoe-multi-arch.diff
+ due to not matching later patches:
+- open-fcoe-update-1.0.6.diff
+  (bnc #459142)
+- 0001-fcoemon-Ensure-pfc-advertise-on-and-pg-advertise-of.patch
+  (bnc #468457)
+- 0002-fcoemon-Remove-the-FCD_SEND_CONF-state.patch
+  (bnc # 468459)
+- 0003-fcoemon-Verify-link-flow-control-if-DCB-is-not-requ.patch
+  (bnc #468463)
+- 0004-fcoemon-Don-t-check-errors-when-modprobe-fcoe.patch
+  (bnc #468466)
+- 0005-fcoemon-Fix-errors-in-configure_dcb_interface-of.patch
+  (bnc # 468467)
+- 0006-fcoemon-GET_PFC_CONFIG-command-is-not-issued-when-s.patch
+  (bnc #468468)
+- open-fcoe-fixes.diff
+  (bnc #465598)
+- open-fcoe-config.diff
+  move device configuration from Makefile to initscript  
+- open-fcoe-multi-arch2.diff
+  remove arch-check from Makefile
+  
+-------------------------------------------------------------------
+Mon Jan 12 17:34:04 CET 2009 - sf@suse.de
+
+- fixes for initscript (bnc #460021) and 
+  configuration paths (bnc #460022) 
+
+-------------------------------------------------------------------
+Mon Dec  1 17:53:17 CET 2008 - sf@suse.de
+
+- update to 10.4 (bnc #438954)
+  - new patch from Intel
+  - Makefile fixes
+  - removed unneeded files from tarball  
+
+-------------------------------------------------------------------
+Mon Nov 24 17:30:11 CET 2008 - sf@suse.de
+
+- new version 1.0.3 (bnc #438954)
+  - add working tools 
+  - add required libraries
+  - add hbaapi
+  - add required headers from dcbd
+
+-------------------------------------------------------------------
+Wed Sep 24 10:09:35 CEST 2008 - hare@suse.de
+
+- Initial package (FATE#303914)
+
