@@ -92,10 +92,10 @@ wait_for_fcoe_if()
 }
 
 ip link set $fcoe_if up
-/usr/sbin/fipvlan -c --format "%s.%d" -s $fcoe_if
+/usr/sbin/fipvlan -c -s $fcoe_if
 wait_for_fcoe_if $fcoe_if
 if [ -n "$edd_if" ] ; then
     ip link set $edd_if up
-    /usr/sbin/fipvlan -c -f "%s.%d" -s $edd_if
+    /usr/sbin/fipvlan -c -s $edd_if
     wait_for_fcoe_if $edd_if
 fi
