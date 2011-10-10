@@ -658,7 +658,7 @@ struct fcoe_port *fcm_new_vlan(int ifindex, int vid)
 
 	if (rtnl_find_vlan(ifindex, vid, vlan_name)) {
 		rtnl_get_linkname(ifindex, real_name);
-		snprintf(vlan_name, IFNAMSIZ, "%s.%d-fcoe", real_name, vid);
+		snprintf(vlan_name, IFNAMSIZ, "%s.%d", real_name, vid);
 		vlan_create(ifindex, vid, vlan_name);
 	}
 	rtnl_set_iff_up(0, vlan_name);
