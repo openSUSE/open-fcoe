@@ -517,6 +517,19 @@ static void fcm_fc_event_handler(struct fc_nl_event *fc_event)
 	}
 }
 
+static void log_nlmsg_error(struct nlmsghdr *hp, int rlen, const char *str)
+{
+	struct nlmsgerr *ep;
+
+	if (NLMSG_OK(hp, rlen)) {
+		ep = (struct nlmsgerr *)NLMSG_NEXT(hp, rlen);
+		FCM_LOG_DBG("%s, err=%d, type=%d\n",
+			    str, ep->error, ep->msg.nlmsg_type);
+	} else {
+		FCM_LOG("%s", str);
+	}
+}
+
 static void fcm_fc_event_recv(void *arg)
 {
 	struct nlmsghdr *hp;
@@ -550,7 +563,7 @@ static void fcm_fc_event_recv(void *arg)
 			break;
 
 		if (hp->nlmsg_type == NLMSG_ERROR) {
-			FCM_LOG("fc nlmsg error");
+			log_nlmsg_error(hp, rlen, "fc nlmsg error");
 			break;
 		}
 
@@ -993,7 +1006,8 @@ static void ieee_get_req(struct fcm_netif *ff)
 	ff->ieee_resp_pending = seq;
 	rc = write(fcm_link_socket, &msg, msg.nl.nlmsg_len);
 	if (rc < 0) {
-		printf("%s: %s: write failed\n", __func__, ff->ifname);
+		FCM_LOG_ERR(errno, "%s: %s: write failed\n", __func__,
+			    ff->ifname);
 		ff->ieee_resp_pending = 0;
 	}
 }
@@ -1422,7 +1436,7 @@ static void fcm_link_recv(void *arg)
 			break;
 
 		if (hp->nlmsg_type == NLMSG_ERROR) {
-			FCM_LOG("nlmsg error");
+			log_nlmsg_error(hp, rlen, "nlmsg error");
 			break;
 		}
 
