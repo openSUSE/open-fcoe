@@ -8,6 +8,12 @@ Mon Oct 10 16:24:24 CEST 2011 - hare@suse.de
 - fcoemon: Remove '-fcoe' suffix from created vlans (bnc#718013)
 
 -------------------------------------------------------------------
+ Fri Sep 30 15:30:59 UTC 2011 - jankit@suse.de
+
+ - Fix broken option processing for fipvlan on
+   ppc64 and s390 (bnc#687808)
+
+-------------------------------------------------------------------
 Mon Aug  8 13:20:02 CEST 2011 - hare@suse.de
 
 - Remove --format option from fipvlan in mkinitrd (bnc#657959)

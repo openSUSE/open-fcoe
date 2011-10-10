@@ -413,7 +413,7 @@ static void help(int status)
 
 void parse_cmdline(int argc, char **argv)
 {
-	char c;
+	int c;
 
 	while (1) {
 		c = getopt_long(argc, argv, GETOPT_STR, long_options, NULL);
