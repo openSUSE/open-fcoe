@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Oct 10 16:24:24 CEST 2011 - hare@suse.de
+
+- Merge in changes from upstream:
+  * Increment CLIF timeout
+  * Fix fcping -h
+  * Quieten fcoemon
+- fcoemon: Remove '-fcoe' suffix from created vlans (bnc#718013)
+
+-------------------------------------------------------------------
 Mon Aug  8 13:20:02 CEST 2011 - hare@suse.de
 
 - Remove --format option from fipvlan in mkinitrd (bnc#657959)
