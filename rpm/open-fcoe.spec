@@ -89,9 +89,9 @@ install -m 755 debug/fcoedump.sh ${RPM_BUILD_ROOT}/usr/share/fcoe/scripts/fcoedu
 %{_mandir}/man8/*
 /usr/share/fcoe
 %dir %{_sysconfdir}/fcoe
-%config(noreplace) %{_sysconfdir}/fcoe/config
-%config(noreplace) %{_sysconfdir}/fcoe/cfg-ethx
-%config(noreplace) %{_sysconfdir}/init.d/boot.fcoe
+%config %{_sysconfdir}/fcoe/config
+%config %{_sysconfdir}/fcoe/cfg-ethx
+%config %{_sysconfdir}/init.d/boot.fcoe
 /lib/mkinitrd
 %config %{_sysconfdir}/bash_completion.d/fcoeadm
 %config %{_sysconfdir}/bash_completion.d/fcoemon
