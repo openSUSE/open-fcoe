@@ -68,9 +68,15 @@ wait_for_fcoe_if()
 	cd /
 	PATH=$PATH PS1='$ ' /bin/sh -i
     fi
-    host=$(lookup_fcoe_host $vif)
+    while [ $retry_count -gt 0 ] ; do
+	host=$(lookup_fcoe_host $vif)
+	[ "$host" ] && break;
+	retry_count=$(($retry_count-1))
+	sleep 1
+    done
     if [ "$host" ] ; then
 	echo -n "Wait for FCoE link on $vif: "
+	retry_count=$udev_timeout
 	while [ $retry_count -gt 0 ] ; do
 	    status=$(cat /sys/class/fc_host/$host/port_state 2> /dev/null)
 	    if [ "$status" = "Online" ] ; then
