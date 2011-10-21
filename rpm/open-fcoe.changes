@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Oct 21 14:31:33 CEST 2011 - hare@suse.de
+
+- Fix fipvlan processing on ppc64 and s390 (bnc#687808)
+- Fix auto mode for bonding devices (backported from upstream)
+- Do not use %config(noreplace) for config files (bnc#706933)
+- Fixup mkinitrd scripts for bnx2fc driver (bnc#725579)
+- Retry check for SCSI host during mkinitrd run
+
+-------------------------------------------------------------------
 Mon Oct 10 16:24:24 CEST 2011 - hare@suse.de
 
 - Merge in changes from upstream:
