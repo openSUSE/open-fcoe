@@ -3,7 +3,7 @@
 #%stage: device
 #
 
-check_fcoe_root() {
+get_fc_host() {
     local devname=${1##/dev/}
     local sysfs_path
 
@@ -22,38 +22,65 @@ check_fcoe_root() {
     esac
 
     if [ -n "$shost_path" ] && [ -d "${shost_path}/fc_host/$shost" ] ; then
-        if grep -q fcoe $shost_path/fc_host/$shost/symbolic_name ; then
-	    ifpath=${shost_path%/host*}
-	    ifname=${ifpath##*/}
-	    echo "$ifname"
-        fi
+	echo "$shost_path"
     fi
+}
+
+get_fcoe_drvname() {
+    local shost_path=$1
+    local shost=${shost_path##*/}
+    local sysfs_path
+
+    fcoe_name=$(cat $shost_path/fc_host/$shost/symbolic_name)
+    case $fcoe_name in
+	*over*)
+	    echo "$fcoe_name"
+	    ;;
+    esac
 }
 
 for bd in $blockdev; do
     update_blockdev $bd
-    ifname="$(check_fcoe_root $bd)"
-    if [ "$ifname" ]; then
+    shost_path="$(get_fc_host $bd)"
+    if [ "$shost_path" ]; then
+	symname="$(get_fcoe_drvname $shost_path)"
+	ifname=${symname#* over }
+	cur_drv=${symname%% *}
+	found=0
+	for d in $fcoe_drv ; do
+	    [ "$d" = "$cur_drv" ] && found=1
+	done
+	if [ "$found" = "0" ] ; then
+	    fcoe_drv="$fcoe_drv $cur_drv"
+	fi
 	if [ -f /proc/net/vlan/$ifname ] ; then
-	    fcoe_vif=$ifname
-	    fcoe_if=$(sed -n 's/Device: \(.*\)/\1/p' /proc/net/vlan/$ifname)
-	    fcoe_vlan=$(sed -n 's/.*VID: \([0-9]*\).*/\1/p' /proc/net/vlan/$ifname)
+	    cur_if=$(sed -n 's/Device: \(.*\)/\1/p' /proc/net/vlan/$ifname)
 	else
-	    fcoe_if=$ifname
-	    fcoe_vif=$ifname
+	    cur_if=$ifname
+	fi
+	found=0
+	for i in $fcoe_if ; do
+	    [ "$i" = "$cur_if" ] && found=1
+	done
+	if [ "$found" = "0" ] ; then
+	    fcoe_if="$fcoe_if $cur_if"
+	fi
+	pci_path=${shost_path%/*}
+	pci_drv=$(readlink $pci_path/driver)
+	for d in $drvlink ; do
+	    [ "$d" = "$pci_drv" ] && found=1
+	done
+	if [ "$found" = 0 ] ; then
+	    drvlink="$drvlink ${pci_drv##*/}"
 	fi
     	root_fcoe=1
-        # This can break, but network does not support more interfaces for now
-        if [ -z "$interface" ] ; then
-            interface="$fcoe_if"
-        fi
     fi
 done
 
 save_var root_fcoe
 save_var fcoe_if
-save_var fcoe_vif
-save_var fcoe_vlan
+save_var fcoe_drv
+save_var drvlink
 
 if [ "${root_fcoe}" ] ; then
     # Create /usr/sbin directory if not present

@@ -2,7 +2,7 @@
 #%stage: device
 #%depends: network lldpad
 #%programs: /usr/sbin/fipvlan /usr/sbin/fcoeadm /sbin/vconfig /sbin/ip
-#%modules: fcoe 8021q
+#%modules: $fcoe_drv 8021q
 #%if: "$root_fcoe"
 #
 ##### FCoE initialization
@@ -91,9 +91,11 @@ wait_for_fcoe_if()
     PATH=$PATH PS1='$ ' /bin/sh -i
 }
 
-ip link set $fcoe_if up
-/usr/sbin/fipvlan -c -s $fcoe_if
-wait_for_fcoe_if $fcoe_if
+for if in "$fcoe_if" ; do
+    ip link set $if up
+    /usr/sbin/fipvlan -c -s $if
+    wait_for_fcoe_if $if
+done
 if [ -n "$edd_if" ] ; then
     ip link set $edd_if up
     /usr/sbin/fipvlan -c -s $edd_if
