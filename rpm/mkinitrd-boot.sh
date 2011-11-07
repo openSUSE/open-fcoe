@@ -1,7 +1,7 @@
 #!/bin/bash
 #%stage: device
 #%depends: network lldpad
-#%programs: /usr/sbin/fipvlan /usr/sbin/fcoeadm /sbin/vconfig /sbin/ip
+#%programs: /usr/sbin/fipvlan /usr/sbin/fcoeadm
 #%modules: $fcoe_drv 8021q
 #%if: "$root_fcoe"
 #
@@ -10,24 +10,6 @@
 ## This script initializes FCoE (FC over Ethernet).
 
 load_modules
-
-create_fcoe_vlan()
-{
-    local if=$1
-    local vlan=$2
-    local vif=$3
-
-    vconfig add $if $vlan
-    tmp_vif=$(sed -n "s/\([^ ]*\).*${vlan}.*${if}/\1/p" /proc/net/vlan/config)
-    if [ "$vif" ] && [ "$tmp_vif" != "$vif" ] ; then
-	ip link set dev $tmp_vif name $vif
-    fi
-    wait_for_events
-    dcbtool sc $if dcb on > /dev/null 2>&1
-    dcbtool sc $if app:fcoe e:1 > /dev/null 2>&1
-    ip link set $if up
-    ip link set $vif up
-}
 
 lookup_vlan_if()
 {
@@ -102,12 +84,10 @@ wait_for_fcoe_if()
 }
 
 for if in $fcoe_if ; do
-    ip link set $if up
     /usr/sbin/fipvlan -c -s $if
     wait_for_fcoe_if $if
 done
 if [ -n "$edd_if" ] ; then
-    ip link set $edd_if up
     /usr/sbin/fipvlan -c -s $edd_if
     wait_for_fcoe_if $edd_if
 fi
