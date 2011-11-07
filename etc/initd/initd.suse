@@ -31,11 +31,11 @@
 # chkconfig: 345 20 80
 #
 ### BEGIN INIT INFO
-# Provides: boot.fcoe
-# Required-Start:
-# Should-Start: boot.multipath
-# Required-Stop:
-# Should-Stop: $null
+# Provides: boot.fcoe fcoe
+# Required-Start: boot.lldpad
+# Should-Start: boot.udev
+# Required-Stop: boot.lldpad
+# Should-Stop: boot.udev
 # Default-Start: B
 # Default-Stop: B
 # Short-Description: Open-FCoE Initiator
