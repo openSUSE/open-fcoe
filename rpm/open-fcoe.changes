@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Nov  7 14:06:57 CET 2011 - hare@suse.de
+
+- fipvlan: start interfaces automatically (bnc#728097)
+- Modify mkinitrd scriptlets for updated fipvlan (bnc#728097)
+- Fix typo on mkintrd scriptlets
+- fipvlan: Make number of link retries configurable (bnc#728103)
+
+-------------------------------------------------------------------
 Mon Nov  7 10:45:35 CET 2011 - hare@suse.de
 
 - System fails to boot on broadcom devices (bnc#725579)
