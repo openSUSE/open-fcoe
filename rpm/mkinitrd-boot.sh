@@ -48,10 +48,14 @@ lookup_fcoe_host()
     local ifname=$1
     local h
 
-    for h in /sys/class/net/$ifname/host* ; do
+    for h in /sys/class/scsi_host/host* ; do
 	[ -d "$h" ] || continue
-	echo ${h##*/}
-	break
+	[ -e $h/symbolic_name ] || continue
+	vif=$(sed -n 's/.* over \(.*\)/\1/p' $h/symbolic_name)
+	if [ "$vif" ] && [ "$ifname" = "$vif" ] ; then
+	    echo ${h##*/}
+	    break
+	fi
     done
 }
 
