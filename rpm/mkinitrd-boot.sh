@@ -30,7 +30,7 @@ lookup_fcoe_host()
     local ifname=$1
     local h
 
-    for h in /sys/class/scsi_host/host* ; do
+    for h in /sys/class/fc_host/host* ; do
 	[ -d "$h" ] || continue
 	[ -e $h/symbolic_name ] || continue
 	vif=$(sed -n 's/.* over \(.*\)/\1/p' $h/symbolic_name)
