@@ -101,7 +101,7 @@ wait_for_fcoe_if()
     PATH=$PATH PS1='$ ' /bin/sh -i
 }
 
-for if in "$fcoe_if" ; do
+for if in $fcoe_if ; do
     ip link set $if up
     /usr/sbin/fipvlan -c -s $if
     wait_for_fcoe_if $if
