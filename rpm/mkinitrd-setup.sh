@@ -66,6 +66,11 @@ for bd in $blockdev; do
 	    fcoe_if="$fcoe_if $cur_if"
 	fi
 	pci_path=${shost_path%/*}
+	case "$pci_path" in
+	    *virtual*)
+		pci_path="/sys/class/net/$cur_if/device"
+		;;
+	esac
 	pci_drv=$(readlink $pci_path/driver)
 	for d in $drvlink ; do
 	    [ "$d" = "$pci_drv" ] && found=1
