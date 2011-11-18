@@ -256,7 +256,7 @@ int fip_recv_vlan_note(struct fiphdr *fh, int ifindex)
 {
 	struct fip_tlv_ptrs tlvs;
 	struct fcf *fcf;
-	struct iff *iff;
+	struct iff *iff, *vlan_iff;
 	uint16_t vlan;
 	unsigned int bitmap, required_tlvs;
 	int len;
@@ -273,8 +273,11 @@ int fip_recv_vlan_note(struct fiphdr *fh, int ifindex)
 		return -1;
 
 	iff = lookup_iff(ifindex, NULL);
-	if (iff)
-		iff->resp_recv = true;
+	if (!iff) {
+		FIP_LOG_ERR(ENODEV, "No matching FIP VLAN found");
+		return -1;
+	}
+	iff->resp_recv = true;
 
 	for (i = 0; i < tlvs.vlanc; i++) {
 		vlan = ntohs(tlvs.vlan[i]->vlan);
@@ -291,6 +294,27 @@ int fip_recv_vlan_note(struct fiphdr *fh, int ifindex)
 		fcf->vlan = vlan;
 		memcpy(fcf->mac_addr, tlvs.mac->mac_addr, ETHER_ADDR_LEN);
 		TAILQ_INSERT_TAIL(&fcfs, fcf, list_node);
+		if (!config.create)
+			continue;
+
+		vlan_iff = lookup_vlan(fcf->ifindex, fcf->vlan);
+		if (!vlan_iff) {
+			char vlan_name[IFNAMSIZ];
+			int rc;
+
+			snprintf(vlan_name, IFNAMSIZ, "%s.%d%s",
+				 iff->ifname, fcf->vlan, config.suffix);
+			rc = vlan_create(fcf->ifindex, fcf->vlan, vlan_name);
+			if (rc < 0)
+				printf("Failed to crate VLAN device %s\n\t%s\n",
+				       vlan_name, strerror(-rc));
+			else
+				printf("Created VLAN device %s\n", vlan_name);
+		} else if (!vlan_iff->running && config.start) {
+			FIP_LOG_DBG("vlan if %d not running, "
+				    "starting", vlan_iff->ifindex);
+			rtnl_set_iff_up(vlan_iff->ifindex, NULL);
+		}
 	}
 
 	return 0;
@@ -502,41 +526,6 @@ int rtnl_listener_handler(struct nlmsghdr *nh, void *arg)
 		return 0;
 	}
 	return -1;
-}
-
-void create_missing_vlans()
-{
-	struct fcf *fcf;
-	struct iff *real_dev, *vlan;
-	char vlan_name[IFNAMSIZ];
-	int rc;
-
-	if (!config.create)
-		return;
-
-	TAILQ_FOREACH(fcf, &fcfs, list_node) {
-		real_dev = lookup_iff(fcf->ifindex, NULL);
-		if (!real_dev) {
-			FIP_LOG_ERR(ENODEV, "lost device %d with discoved FCF?",
-				    fcf->ifindex);
-			continue;
-		}
-		vlan = lookup_vlan(fcf->ifindex, fcf->vlan);
-		if (vlan) {
-			FIP_LOG_DBG("VLAN %s.%d already exists as %s",
-				    real_dev->ifname, fcf->vlan, vlan->ifname);
-			continue;
-		}
-		snprintf(vlan_name, IFNAMSIZ, "%s.%d%s",
-			 real_dev->ifname, fcf->vlan, config.suffix);
-		rc = vlan_create(fcf->ifindex, fcf->vlan, vlan_name);
-		if (rc < 0)
-			printf("Failed to crate VLAN device %s\n\t%s\n",
-			       vlan_name, strerror(-rc));
-		else
-			printf("Created VLAN device %s\n", vlan_name);
-	}
-	printf("\n");
 }
 
 int fcoe_instance_start(char *ifname)
@@ -782,14 +771,6 @@ int main(int argc, char **argv)
 	do_vlan_discovery();
 
 	rc = print_results();
-	if (!rc && config.create) {
-		create_missing_vlans();
-		/*
-		 * need to listen for the RTM_NETLINK messages
-		 * about the new VLAN devices
-		 */
-		recv_loop(500);
-	}
 	if (!rc && config.start)
 		start_fcoe();
 
