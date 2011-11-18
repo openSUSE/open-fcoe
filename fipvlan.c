@@ -389,6 +389,11 @@ void rtnl_recv_newlink(struct nlmsghdr *nh)
 				return;
 			}
 			TAILQ_INSERT_TAIL(&real_dev->vlans, iff, list_node);
+			if (!iff->running) {
+				FIP_LOG_DBG("vlan if %d not running, "
+					    "starting", iff->ifindex);
+				rtnl_set_iff_up(iff->ifindex, NULL);
+			}
 			return;
 		}
 		/* ignore bonding interfaces */
@@ -530,7 +535,6 @@ void create_missing_vlans()
 			       vlan_name, strerror(-rc));
 		else
 			printf("Created VLAN device %s\n", vlan_name);
-		rtnl_set_iff_up(0, vlan_name);
 	}
 	printf("\n");
 }
