@@ -132,6 +132,7 @@ struct iff {
 	bool linkup_sent;
 	bool req_sent;
 	bool resp_recv;
+	bool fcoe_started;
 	TAILQ_ENTRY(iff) list_node;
 	struct iff_list_head vlans;
 };
@@ -155,7 +156,7 @@ struct fcf *lookup_fcf(int ifindex, uint16_t vlan, unsigned char *mac)
 
 	TAILQ_FOREACH(fcf, &fcfs, list_node)
 		if ((ifindex == fcf->ifindex) && (vlan == fcf->vlan) &&
-		    (memcmp(mac, fcf->mac_addr, ETHER_ADDR_LEN) == 0))
+		    (!mac || memcmp(mac, fcf->mac_addr, ETHER_ADDR_LEN) == 0))
 			return fcf;
 	return NULL;
 }
@@ -185,6 +186,21 @@ struct iff *lookup_vlan(int ifindex, short int vid)
 	return NULL;
 }
 
+struct iff *lookup_iff_or_vlan(int ifindex)
+{
+	struct iff *iff, *vlan;
+
+	TAILQ_FOREACH(iff, &interfaces, list_node) {
+		if (ifindex == iff->ifindex)
+			return iff;
+		TAILQ_FOREACH(vlan, &iff->vlans, list_node) {
+			if (ifindex == vlan->ifindex)
+				return vlan;
+		}
+	}
+	return NULL;
+}
+
 struct iff *find_vlan_real_dev(struct iff *vlan)
 {
 	struct iff *real_dev;
@@ -193,6 +209,20 @@ struct iff *find_vlan_real_dev(struct iff *vlan)
 			return real_dev;
 	}
 	return NULL;
+}
+
+int fcoe_instance_start(char *ifname)
+{
+	int fd, rc;
+	FIP_LOG_DBG("%s on %s\n", __func__, ifname);
+	fd = open(SYSFS_FCOE "/create", O_WRONLY);
+	if (fd < 0) {
+		FIP_LOG_ERRNO("failed to open fcoe create file");
+		return fd;
+	}
+	rc = write(fd, ifname, strlen(ifname));
+	close(fd);
+	return rc < 0 ? rc : 0;
 }
 
 struct fip_tlv_ptrs {
@@ -310,10 +340,19 @@ int fip_recv_vlan_note(struct fiphdr *fh, int ifindex)
 				       vlan_name, strerror(-rc));
 			else
 				printf("Created VLAN device %s\n", vlan_name);
-		} else if (!vlan_iff->running && config.start) {
+			continue;
+		}
+		if (!config.start)
+			continue;
+		if (!vlan_iff->running) {
 			FIP_LOG_DBG("vlan if %d not running, "
 				    "starting", vlan_iff->ifindex);
 			rtnl_set_iff_up(vlan_iff->ifindex, NULL);
+		} else if (!vlan_iff->fcoe_started) {
+			printf("Starting FCoE on interface %s\n",
+			       vlan_iff->ifname);
+			fcoe_instance_start(vlan_iff->ifname);
+			vlan_iff->fcoe_started = true;
 		}
 	}
 
@@ -353,7 +392,7 @@ void rtnl_recv_newlink(struct nlmsghdr *nh)
 	struct rtattr *ifla[__IFLA_MAX];
 	struct rtattr *linkinfo[__IFLA_INFO_MAX];
 	struct rtattr *vlan[__IFLA_VLAN_MAX];
-	struct iff *iff, *real_dev;
+	struct iff *iff, *real_dev = NULL;
 	int origdev = 1;
 	bool running;
 
@@ -369,13 +408,30 @@ void rtnl_recv_newlink(struct nlmsghdr *nh)
 		return;
 
 	running = !!(ifm->ifi_flags & (IFF_RUNNING | IFF_SLAVE));
-	iff = lookup_iff(ifm->ifi_index, NULL);
+	iff = lookup_iff_or_vlan(ifm->ifi_index);
 	if (iff) {
 		/* already tracking, update operstate and return */
 		iff->running = running;
-		if (iff->running)
+		FIP_LOG_DBG("Checking for FCoE on %sif %d",
+			    iff->is_vlan ? "VLAN " : "", iff->ifindex);
+		if (iff->running) {
 			pfd_add(iff->ps);
-		else
+			if (!config.start || !iff->is_vlan)
+				return;
+			real_dev = find_vlan_real_dev(iff);
+			if (!real_dev) {
+				FIP_LOG_ERR(ENODEV, "VLAN %d without a parent",
+					    iff->ifindex);
+				return;
+			}
+			if (!iff->fcoe_started &&
+			    lookup_fcf(real_dev->ifindex, iff->vid, NULL)) {
+				printf("Starting FCoE on interface %s\n",
+				       iff->ifname);
+				fcoe_instance_start(iff->ifname);
+				iff->fcoe_started = true;
+			}
+		} else
 			pfd_remove(iff->ps);
 		return;
 	}
@@ -528,39 +584,6 @@ int rtnl_listener_handler(struct nlmsghdr *nh, void *arg)
 	return -1;
 }
 
-int fcoe_instance_start(char *ifname)
-{
-	int fd, rc;
-	FIP_LOG_DBG("%s on %s\n", __func__, ifname);
-	fd = open(SYSFS_FCOE "/create", O_WRONLY);
-	if (fd < 0) {
-		FIP_LOG_ERRNO("failed to open fcoe create file");
-		return fd;
-	}
-	rc = write(fd, ifname, strlen(ifname));
-	close(fd);
-	return rc < 0 ? rc : 0;
-}
-
-void start_fcoe()
-{
-	struct fcf *fcf;
-	struct iff *iff;
-
-	TAILQ_FOREACH(fcf, &fcfs, list_node) {
-		iff = lookup_vlan(fcf->ifindex, fcf->vlan);
-		if (!iff) {
-			FIP_LOG_ERR(ENODEV,
-				    "Cannot start FCoE on VLAN %d, ifindex %d, "
-				    "because the VLAN device does not exist",
-				    fcf->vlan, fcf->ifindex);
-			continue;
-		}
-		printf("Starting FCoE on interface %s\n", iff->ifname);
-		fcoe_instance_start(iff->ifname);
-	}
-}
-
 int print_results()
 {
 	struct iff *iff;
@@ -673,7 +696,6 @@ retry:
 		retry_count = 0;
 		goto retry;
 	}
-	recv_loop(200);
 	TAILQ_FOREACH(iff, &interfaces, list_node)
 		/* if we did not receive a response, retry */
 		if (iff->req_sent && !iff->resp_recv && retry_count++ < 10) {
@@ -771,8 +793,6 @@ int main(int argc, char **argv)
 	do_vlan_discovery();
 
 	rc = print_results();
-	if (!rc && config.start)
-		start_fcoe();
 
 	cleanup_interfaces();
 
