@@ -84,10 +84,12 @@ wait_for_fcoe_if()
 }
 
 for if in $fcoe_if ; do
-    /usr/sbin/fipvlan -c -s $if
-    wait_for_fcoe_if $if
+    if /usr/sbin/fipvlan -c -s $if ; then
+	wait_for_fcoe_if $if
+    fi
 done
 if [ -n "$edd_if" ] ; then
-    /usr/sbin/fipvlan -c -s $edd_if
-    wait_for_fcoe_if $edd_if
+    if /usr/sbin/fipvlan -c -s $edd_if ; then
+	wait_for_fcoe_if $edd_if
+    fi
 fi
