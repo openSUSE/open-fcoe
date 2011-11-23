@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Nov 23 12:31:59 CET 2011 - hare@suse.de
+
+- fipvlan: Rewrite to start various stages from netlink handler
+- Update mkinitrd script to check fipvlan status (bnc#730957)
+
+-------------------------------------------------------------------
 Thu Nov 17 08:48:42 CET 2011 - hare@suse.de
 
 - Detect correct network driver for Intel-based setups (bnc#730710)
