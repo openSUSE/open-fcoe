@@ -43,53 +43,45 @@ lookup_fcoe_host()
 
 wait_for_fcoe_if()
 {
-    local ifname=$1
+    local if_list=$1
     local host vif
     local retry_count=$udev_timeout
+    local retry
 
-    vif=$(lookup_vlan_if $ifname)
-    if [ -z "$vif" ] ; then
-	echo "No VLAN interface created on $ifname"
-	echo "dropping to /bin/sh"
-	cd /
-	PATH=$PATH PS1='$ ' /bin/sh -i
-    fi
+    vif_list=$(/usr/sbin/fipvlan --start --create $if_list | sed -n 's/\(eth[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p')
+    echo -n "Waiting for FCoE on $vif_list: "
     while [ $retry_count -gt 0 ] ; do
-	host=$(lookup_fcoe_host $vif)
-	[ "$host" ] && break;
-	retry_count=$(($retry_count-1))
-	sleep 1
-    done
-    if [ "$host" ] ; then
-	echo -n "Wait for FCoE link on $vif: "
-	retry_count=$udev_timeout
-	while [ $retry_count -gt 0 ] ; do
+	retry=0
+	for vif in $vif_list ; do
+	    if ! ip link show $vif > /dev/null 2>&1 ; then
+		echo -n "O"
+		retry=$(($retry + 1));
+		continue;
+	    fi
+	    host=$(lookup_fcoe_host $vif)
+	    if [ -z "$host" ] ; then
+		echo -n "o"
+		retry=$(($retry + 1));
+		continue;
+	    fi
 	    status=$(cat /sys/class/fc_host/$host/port_state 2> /dev/null)
 	    if [ "$status" = "Online" ] ; then
-		echo "Ok"
-		return 0
+		continue;
 	    fi
 	    echo -n "."
-            retry_count=$(($retry_count-1))
-            sleep 2
+	    retry=$(($retry + 1));
 	done
-	echo -n "Failed; "
+	[ $retry -eq 0 ] && break;
+        retry_count=$(($retry_count-1))
+        sleep 2
+    done
+    if [ $retry_count -eq 0 -a $retry -gt 0 ] ; then
+	echo "timeout; dropping to /bin/sh"
+	cd /
+	PATH=$PATH PS1='$ ' /bin/sh -i
     else
-	echo -n "FC host not created; "
+	echo "Ok"
     fi
-
-    echo "dropping to /bin/sh"
-    cd /
-    PATH=$PATH PS1='$ ' /bin/sh -i
 }
 
-for if in $fcoe_if ; do
-    if /usr/sbin/fipvlan -c -s $if ; then
-	wait_for_fcoe_if $if
-    fi
-done
-if [ -n "$edd_if" ] ; then
-    if /usr/sbin/fipvlan -c -s $edd_if ; then
-	wait_for_fcoe_if $edd_if
-    fi
-fi
+wait_for_fcoe_if "$fcoe_if $edd_if"
