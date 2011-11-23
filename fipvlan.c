@@ -647,11 +647,7 @@ int send_vlan_requests(struct iff *iff)
 	if (iff->resp_recv)
 		return 0;
 	if (!iff->running) {
-		if (iff->linkup_sent) {
-			FIP_LOG_DBG("if %d not running, "
-				    "waiting for link up",
-				    iff->ifindex);
-		} else {
+		if (!iff->linkup_sent) {
 			FIP_LOG_DBG("if %d not running, "
 				    "starting",
 				    iff->ifindex);
@@ -674,8 +670,7 @@ void do_vlan_discovery(void)
 {
 	struct iff *iff;
 	int retry_count = 0;
-	int skip_retry_count = 0;
-	int skipped = 0;
+	int skipped = 0, retry_iff = 0;
 retry:
 	if (config.automode) {
 		TAILQ_FOREACH(iff, &interfaces, list_node) {
@@ -689,19 +684,39 @@ retry:
 			skipped += send_vlan_requests(iff);
 		}
 	}
-	if (skipped && skip_retry_count++ < config.link_retry) {
-		FIP_LOG_DBG("waiting for IFF_RUNNING [%d]\n", skip_retry_count);
-		recv_loop(500);
-		skipped = 0;
-		retry_count = 0;
+	TAILQ_FOREACH(iff, &interfaces, list_node) {
+		if (!iff->running && iff->linkup_sent) {
+			FIP_LOG_DBG("if %d: waiting for IFF_RUNNING [%d]\n",
+				    iff->ifindex, retry_count);
+			retry_iff++;
+			continue;
+		}
+		/* if we did not receive a response, retry */
+		if (iff->req_sent && !iff->resp_recv) {
+			FIP_LOG_DBG("if %d: VLAN discovery RETRY [%d]",
+				    iff->ifindex, retry_count);
+			retry_iff++;
+			continue;
+		}
+		if (config.create) {
+			struct iff *vlan;
+
+			TAILQ_FOREACH(vlan, &iff->vlans, list_node) {
+				if (!vlan->running) {
+					FIP_LOG_DBG("vlan %d: waiting for "
+						    "IFF_RUNNING [%d]",
+						    vlan->ifindex, retry_count);
+					retry_iff++;
+					continue;
+				}
+			}
+		}
+	}
+	if (retry_iff && retry_count++ < config.link_retry) {
+		recv_loop(1000);
+		retry_iff = 0;
 		goto retry;
 	}
-	TAILQ_FOREACH(iff, &interfaces, list_node)
-		/* if we did not receive a response, retry */
-		if (iff->req_sent && !iff->resp_recv && retry_count++ < 10) {
-			FIP_LOG_DBG("VLAN discovery RETRY [%d]", retry_count);
-			goto retry;
-		}
 }
 
 void cleanup_interfaces(void)
