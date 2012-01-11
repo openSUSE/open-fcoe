@@ -19,7 +19,7 @@ fipvlan - Fibre Channel over Ethernet VLAN Discovery
 
 SYNOPSIS
 --------
-*fipvlan* [-c|--create] [-s|--start] _interfaces_
+*fipvlan* [-c|--create] [-s|--start] [-d|--debug] [-l|--link-retry] _interfaces_
 
 *fipvlan* -a|--auto [-c|--create] [-d|--debug]
  [-s|--start] [-l|--link-retry _count_]

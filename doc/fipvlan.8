@@ -20,7 +20,7 @@
 fipvlan \- Fibre Channel over Ethernet VLAN Discovery
 .SH "SYNOPSIS"
 .sp
-\fBfipvlan\fR [\-c|\-\-create] [\-s|\-\-start] \fIinterfaces\fR
+\fBfipvlan\fR [\-c|\-\-create] [\-s|\-\-start] [\-d|\-\-debug] \fIinterfaces\fR
 .sp
 \fBfipvlan\fR \-a|\-\-auto [\-c|\-\-create] [\-d|\-\-debug]
 [\-s|\-\-start] [\-l|\-\-link-retry <num>]
@@ -82,6 +82,10 @@ Append the specified string \fI<suffix string>\fR to VLAN interface names.
 .RS 4
 Retry check for link up up to \fI<number of retries>\fR times. The
 link state is retried every 500 ms. The default is 20.
+.PP
+\fB\-u\fR, \fB\-\-link-up\fR
+.RS 4
+Leave link up if VLAN has been detected.
 .RE
 .PP
 \fB\-h\fR, \fB\-\-help\fR

@@ -66,6 +66,7 @@ struct {
 	bool create;
 	bool start;
 	bool debug;
+	bool link_up;
 	int link_retry;
 	char suffix[256];
 } config = {
@@ -520,7 +521,7 @@ void rtnl_recv_newlink(struct nlmsghdr *nh)
 
 /* command line arguments */
 
-#define GETOPT_STR "acdf:l:shv"
+#define GETOPT_STR "acdf:l:shuv"
 
 static const struct option long_options[] = {
 	{ "auto", no_argument, NULL, 'a' },
@@ -529,6 +530,7 @@ static const struct option long_options[] = {
 	{ "debug", no_argument, NULL, 'd' },
 	{ "suffix", required_argument, NULL, 'f' },
 	{ "link-retry", required_argument, NULL, 'l' },
+	{ "link-up", required_argument, NULL, 'u' },
 	{ "help", no_argument, NULL, 'h' },
 	{ "version", no_argument, NULL, 'v' },
 	{ NULL, 0, NULL, 0 }
@@ -545,6 +547,7 @@ static void help(int status)
 		"  -s, --start          Start FCoE login automatically\n"
 		"  -f, --suffix		Append the suffix to VLAN interface name\n"
 		"  -l, --link-retry     Number of retries for link up\n"
+		"  -u, --link-up        Leave link up if VLAN has been detected\n"
 		"  -h, --help           Display this help and exit\n"
 		"  -v, --version        Display version information and exit\n",
 		exe);
@@ -579,6 +582,9 @@ void parse_cmdline(int argc, char **argv)
 			break;
 		case 'l':
 			config.link_retry = strtoul(optarg, NULL, 10);
+			break;
+		case 'u':
+			config.link_up = true;
 			break;
 		case 'h':
 			help(0);
@@ -763,11 +769,15 @@ void cleanup_interfaces(void)
 
 	if (config.automode) {
 		TAILQ_FOREACH(iff, &interfaces, list_node) {
-			if (iff->linkup_sent && TAILQ_EMPTY(&iff->vlans)) {
-				FIP_LOG_DBG("shutdown if %d",
-					    iff->ifindex);
-				rtnl_set_iff_down(iff->ifindex, NULL);
-				iff->linkup_sent = false;
+			if (iff->linkup_sent) {
+				if (config.link_up && iff->resp_recv)
+					continue;
+				if (TAILQ_EMPTY(&iff->vlans)) {
+					FIP_LOG_DBG("shutdown if %d",
+						    iff->ifindex);
+					rtnl_set_iff_down(iff->ifindex, NULL);
+					iff->linkup_sent = false;
+				}
 			}
 		}
 	} else {
@@ -777,11 +787,15 @@ void cleanup_interfaces(void)
 				skipped++;
 				continue;
 			}
-			if (iff->linkup_sent && TAILQ_EMPTY(&iff->vlans)) {
-				FIP_LOG_DBG("shutdown if %d",
-					    iff->ifindex);
-				rtnl_set_iff_down(iff->ifindex, NULL);
-				iff->linkup_sent = false;
+			if (iff->linkup_sent) {
+				if (config.link_up && iff->resp_recv)
+					continue;
+				if (TAILQ_EMPTY(&iff->vlans)) {
+					FIP_LOG_DBG("shutdown if %d",
+						    iff->ifindex);
+					rtnl_set_iff_down(iff->ifindex, NULL);
+					iff->linkup_sent = false;
+				}
 			}
 		}
 	}
