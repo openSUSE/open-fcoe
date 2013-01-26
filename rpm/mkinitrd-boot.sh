@@ -52,6 +52,7 @@ wait_for_fcoe_if()
     echo -n "Waiting for FCoE on $vif_list: "
     while [ $retry_count -gt 0 ] ; do
 	retry=0
+	found=0
 	for vif in $vif_list ; do
 	    if ! ip link show $vif > /dev/null 2>&1 ; then
 		echo -n "O"
@@ -66,12 +67,13 @@ wait_for_fcoe_if()
 	    fi
 	    status=$(cat /sys/class/fc_host/$host/port_state 2> /dev/null)
 	    if [ "$status" = "Online" ] ; then
+		found=1;
 		continue;
 	    fi
 	    echo -n "."
 	    retry=$(($retry + 1));
 	done
-	[ $retry -eq 0 ] && break;
+	[ $retry -eq 0 ] || [found -eq 1 ] && break;
         retry_count=$(($retry_count-1))
         sleep 2
     done
