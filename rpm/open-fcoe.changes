@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar 14 12:56:00 CET 2013 - hare@suse.de
+
+- Start fcoe on physical interface if vlan reply has
+  vlan id 0 (bnc#809078)
+
+-------------------------------------------------------------------
 Mon Mar 11 12:42:57 CET 2013 - hare@suse.de
 
 - Handle multiple VLANs (bnc#800625)
