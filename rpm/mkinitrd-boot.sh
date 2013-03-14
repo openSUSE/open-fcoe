@@ -54,6 +54,9 @@ wait_for_fcoe_if()
 	retry=0
 	found=0
 	for vif in $vif_list ; do
+	    if [[ $vif =~ eth[0-9]+\.0$ ]]; then
+		vif=$(echo $vif | sed -n -e 's/\(eth[0-9]\+\).0$/\1/p')
+	    fi
 	    if ! ip link show $vif > /dev/null 2>&1 ; then
 		echo -n "O"
 		retry=$(($retry + 1));
