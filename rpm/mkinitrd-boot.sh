@@ -76,7 +76,7 @@ wait_for_fcoe_if()
 	    echo -n "."
 	    retry=$(($retry + 1));
 	done
-	[ $retry -eq 0 ] || [found -eq 1 ] && break;
+	[ $retry -eq 0 ] || [ $found -eq 1 ] && break;
         retry_count=$(($retry_count-1))
         sleep 2
     done
