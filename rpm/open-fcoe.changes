@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Mar 28 09:45:23 CET 2013 - hare@suse.de
+
+- Fixup script error in mkinitrd-boot.sh (bnc#800625)
+
+-------------------------------------------------------------------
 Thu Mar 14 12:56:00 CET 2013 - hare@suse.de
 
 - Start fcoe on physical interface if vlan reply has
