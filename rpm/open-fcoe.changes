@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr 19 17:56:04 CEST 2013 - hare@suse.de
+
+- Do not shutdown physical interface if it has
+  an active FCoE connection (bnc#814151)
+
+-------------------------------------------------------------------
 Thu Mar 28 09:45:23 CET 2013 - hare@suse.de
 
 - Fixup script error in mkinitrd-boot.sh (bnc#800625)
