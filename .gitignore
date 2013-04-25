@@ -18,6 +18,7 @@ fcoeplumb
 fcoe_utils_version.h
 
 # compile generated files
+*.a
 *.o
 fcoeadm
 fcoemon
@@ -27,6 +28,10 @@ fcnsq
 fcrls
 etc/initd/fcoe
 
+# generated xml files
+doc/*.xml
+
 # build.sh generated files
+fcoe-utils-*.tar.bz2
 fcoe-utils-*.tar.gz
 fcoe-utils-*.rpm
