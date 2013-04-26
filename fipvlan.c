@@ -346,7 +346,9 @@ int fip_recv_vlan_note(struct fiphdr *fh, int ifindex)
 			 * started on the physical interface itself.
 			 */
 			FIP_LOG_DBG("VLAN id is 0 for %s\n", iff->ifname);
-			if (config.start) {
+			if (!config.start)
+				continue;
+			if (!iff->fcoe_started) {
 				printf("Starting FCoE on interface %s\n",
 				       iff->ifname);
 				fcoe_instance_start(iff->ifname);
