@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed May  8 15:29:14 CEST 2013 - hare@suse.de
+
+- fipvlan: Check for existing FCoE connection on physical interface
+- fipvlan: break out of receive loop on error (bnc#768500)
+
+-------------------------------------------------------------------
 Fri Apr 19 17:56:04 CEST 2013 - hare@suse.de
 
 - Do not shutdown physical interface if it has
