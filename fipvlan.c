@@ -663,11 +663,12 @@ void recv_loop(int timeout)
 			rtnl_recv(pfd[0].fd, rtnl_listener_handler, NULL);
 		/* everything else should be FIP packet sockets */
 		for (i = 1; i < pfd_len; i++) {
-		    if (pfd[i].revents & POLLIN) {
+			if (pfd[i].revents & POLLIN) {
 				rc = fip_recv(pfd[i].fd, fip_vlan_handler,
 					      NULL);
 				if (rc < 0)
 					break;
+			}
 		}
 	}
 }
