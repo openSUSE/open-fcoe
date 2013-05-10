@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri May 10 13:03:09 CEST 2013 - hare@suse.de
+
+- fipvlan: Fixup typo in recv_loop()
+
+-------------------------------------------------------------------
 Wed May  8 15:29:14 CEST 2013 - hare@suse.de
 
 - fipvlan: Check for existing FCoE connection on physical interface
