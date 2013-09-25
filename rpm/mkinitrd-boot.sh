@@ -48,7 +48,7 @@ wait_for_fcoe_if()
     local retry_count=$udev_timeout
     local retry
 
-    vif_list=$(/usr/sbin/fipvlan --start --create $if_list | sed -n 's/\(eth[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p')
+    vif_list=$(/usr/sbin/fipvlan --start --create $if_list --link-retry=$retry_count | sed -n 's/\(eth[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p')
     echo -n "Waiting for FCoE on $vif_list: "
     while [ $retry_count -gt 0 ] ; do
 	retry=0
