@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Sep 25 08:04:25 CEST 2013 - hare@suse.de
+
+- Add '--link-retry' to fipvlan in mkinitrd-boot.sh (bnc#838739)
+
+-------------------------------------------------------------------
 Fri May 10 13:03:09 CEST 2013 - hare@suse.de
 
 - fipvlan: Fixup typo in recv_loop()
