@@ -48,7 +48,17 @@ wait_for_fcoe_if()
     local retry_count=$udev_timeout
     local retry
 
+    if [ -z "if_list" ] ; then
+	echo "No FCoE interfaces"
+	return
+    fi
+    echo "Starting FCoE on $if_list"
     vif_list=$(/usr/sbin/fipvlan --start --create $if_list --link-retry=$retry_count | sed -n 's/\(eth[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p')
+    if [ -z "$vif_list" ] ; then
+	echo "No FCoE interfaces created; dropping to /bin/sh"
+	cd /
+	PATH=$PATH PS1='$ ' /bin/sh -i
+    fi
     echo -n "Waiting for FCoE on $vif_list: "
     while [ $retry_count -gt 0 ] ; do
 	retry=0
