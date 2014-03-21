@@ -46,7 +46,8 @@ wait_for_fcoe_if()
     local if_list=$1
     local host vif
     local retry_count=$udev_timeout
-    local retry
+    local retry vif_down vif_offline
+    local vif_down_old vif_offline_old
 
     if [ -z "if_list" ] ; then
 	echo "No FCoE interfaces"
@@ -60,9 +61,13 @@ wait_for_fcoe_if()
 	PATH=$PATH PS1='$ ' /bin/sh -i
     fi
     echo -n "Waiting for FCoE on $vif_list: "
+    vif_down_old=0
+    vif_offline_old=0
     while [ $retry_count -gt 0 ] ; do
 	retry=0
 	found=0
+	vif_down=0
+	vif_offline=0
 	for vif in $vif_list ; do
 	    if [[ $vif =~ eth[0-9]+\.0$ ]]; then
 		vif=$(echo $vif | sed -n -e 's/\(eth[0-9]\+\).0$/\1/p')
@@ -79,15 +84,25 @@ wait_for_fcoe_if()
 		continue;
 	    fi
 	    status=$(cat /sys/class/fc_host/$host/port_state 2> /dev/null)
-	    if [ "$status" = "Online" ] ; then
+	    if [ "$status" = "Linkdown" ] ; then
+		echo -n "|"
+		vif_down=$(($vif_down + 1));
+	    elif [ "$status" = "Online" ] ; then
 		found=1;
 		continue;
+	    else
+		echo -n "."
+		vif_offline=$(($vif_offline + 1))
 	    fi
-	    echo -n "."
 	    retry=$(($retry + 1));
 	done
 	[ $retry -eq 0 ] || [ $found -eq 1 ] && break;
-        retry_count=$(($retry_count-1))
+	if [ $vif_down -eq $vif_down_old ] &&
+	    [ $vif_offline -eq $vif_offline_old ] ; then
+            retry_count=$(($retry_count-1))
+	fi
+	vif_down_old=$vif_down
+	vif_offline_old=$vif_offline
         sleep 2
     done
     if [ $retry_count -eq 0 -a $retry -gt 0 ] ; then
