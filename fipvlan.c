@@ -169,7 +169,7 @@ static struct fcf *lookup_fcf(struct fcf_list_head *head, int ifindex,
 
 	TAILQ_FOREACH(fcf, head, list_node)
 		if ((ifindex == fcf->ifindex) && (vlan == fcf->vlan) &&
-		    (memcmp(mac, fcf->mac_addr, ETHER_ADDR_LEN) == 0))
+		    (!mac || memcmp(mac, fcf->mac_addr, ETHER_ADDR_LEN) == 0))
 			return fcf;
 	return NULL;
 }
