@@ -451,7 +451,8 @@ static void rtnl_recv_newlink(struct nlmsghdr *nh)
 		int i, iff_selected = 0;
 
 		for (i = 0; i < config.namec; i++) {
-			if (!strcmp(iff->ifname, config.namev[i]))
+			if (!strncmp(iff->ifname, config.namev[i],
+				     strlen(config.namev[i])))
 				iff_selected = 1;
 		}
 		if (!iff_selected) {
