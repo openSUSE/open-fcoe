@@ -397,10 +397,17 @@ static void rtnl_recv_newlink(struct nlmsghdr *nh)
 		/* already tracking, update operstate and return */
 		iff->running = running;
 		if (!iff->running) {
-			pfd_remove(iff->ps);
+			if (iff->fip_ready) {
+				pfd_remove(iff->ps);
+				iff->fip_ready = false;
+			}
 			return;
 		}
-		pfd_add(iff->ps);
+		if (iff->ps >= 0 && !iff->fip_ready) {
+			pfd_add(iff->ps);
+			iff->fip_ready = true;
+		}
+
 		if (!config.start)
 			return;
 
@@ -440,6 +447,7 @@ static void rtnl_recv_newlink(struct nlmsghdr *nh)
 	iff->ifindex = ifm->ifi_index;
 	iff->running = running;
 	iff->fip_ready = false;
+	iff->ps = -1;
 	if (ifla[IFLA_LINK])
 		iff->iflink = *(int *)RTA_DATA(ifla[IFLA_LINK]);
 	else
@@ -827,7 +835,8 @@ static int probe_fip_interface(struct iff *iff)
 	if (iff->req_sent)
 		return 0;
 
-	if (!iff->fip_ready) {
+	if (iff->ps < 0) {
+		iff->fip_ready = false;
 		iff->ps = fip_socket(iff->ifindex, FIP_NONE);
 		if (iff->ps < 0) {
 			FIP_LOG_DBG("if %d not ready\n", iff->ifindex);
@@ -835,6 +844,8 @@ static int probe_fip_interface(struct iff *iff)
 		}
 		setsockopt(iff->ps, SOL_PACKET, PACKET_ORIGDEV,
 			   &origdev, sizeof(origdev));
+	}
+	if (!iff->fip_ready) {
 		pfd_add(iff->ps);
 		iff->fip_ready = true;
 	}
