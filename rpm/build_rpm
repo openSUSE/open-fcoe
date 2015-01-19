@@ -4,13 +4,13 @@
 #
 
 RPM="open-fcoe"
-BRANCH="sles11-sp3"
+BRANCH="sles11-sp4"
 BASENAME="fcoe-utils"
-BASEVER="1.0.26"
+BASEVER="1.0.29"
 BASETAG="v$BASEVER"
 DESTDIR=
 TMPDIR=
-OBS_PRJ=SUSE:SLE-11-SP3:Update:Test
+OBS_PRJ=SUSE:SLE-11-SP4:GA
 OBS_BRANCH=home:hreinecke:branches
 OSC="osc -A https://api.suse.de"
 uncommitted_changes=0
@@ -48,7 +48,7 @@ while [ $# -gt 0 ] ; do
             shift;
             ;;
 	-m|--maintenance)
-	    OBS=SUSE:SLE-11-SP3:Update:Test
+	    OBS=SUSE:SLE-11-SP4:Update:Test
 	    shift;
 	    ;;
         -u|--update)

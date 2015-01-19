@@ -1,4 +1,18 @@
 -------------------------------------------------------------------
+Mon Jan 19 11:24:01 CET 2015 - hare@suse.de
+
+- Port to SLES11 SP4
+  * Update to version 1.0.29
+  * Include patches from upstream up to commit
+    493b5440ac0738cea44d99879a4232e0d3e0dfae
+  * Port SLES specifc patches from SLES11 SP3
+
+-------------------------------------------------------------------
+Mon Jan 19 10:03:12 CET 2015 - hare@suse.de
+
+- Add 'fcoe_delay' parameter for DCB startup (bnc#873306)
+
+-------------------------------------------------------------------
 Wed Sep 25 08:04:25 CEST 2013 - hare@suse.de
 
 - Add '--link-retry' to fipvlan in mkinitrd-boot.sh (bnc#838739)

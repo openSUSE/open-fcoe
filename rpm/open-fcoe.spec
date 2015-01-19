@@ -26,11 +26,11 @@ PreReq:         %fillup_prereq %insserv_prereq
 Requires:       libhbalinux2 lldpad
 BuildRequires:  libHBAAPI2-devel libhbalinux2 libnl-devel lldpad-devel
 AutoReqProv:    on
-Version:        1.0.26
+Version:        1.0.29
 Release:        0.<RELEASE7>
 Summary:        Open-FCoE userspace management tools
 Source0:        http://www.open-fcoe.org/fcoe-utils-%{version}.tar.bz2
-Patch0:         fcoe-utils-sles11-sp3.diff.bz2
+Patch0:         fcoe-utils-sles11-sp4.diff.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
