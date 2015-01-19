@@ -54,6 +54,7 @@ wait_for_fcoe_if()
 	return
     fi
     echo "Starting FCoE on $if_list"
+    sleep $fcoe_delay
     vif_list=$(/usr/sbin/fipvlan --start --create $if_list --link-retry=$retry_count | sed -n 's/\(eth[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p')
     if [ -z "$vif_list" ] ; then
 	echo "No FCoE interfaces created; dropping to /bin/sh"

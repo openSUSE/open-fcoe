@@ -3,6 +3,9 @@
 #%stage: device
 #
 
+# Default DCB startup delay
+fcoe_delay=30
+
 get_fc_host() {
     local devname=${1##/dev/}
     local sysfs_path
@@ -86,6 +89,7 @@ save_var root_fcoe
 save_var fcoe_if
 save_var fcoe_drv
 save_var drvlink
+save_var fcoe_delay
 
 if [ "${root_fcoe}" ] ; then
     # Create /usr/sbin directory if not present
