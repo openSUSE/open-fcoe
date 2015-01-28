@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Jan 28 10:32:11 CET 2015 - hare@suse.de
+
+- Fixup crash in fipvlan
+- Fixup fipvlan to start FCoE on an existing VLAN
+- Allow FCF lookup with a MAC address
+- Fixup build on 32-bit platforms
+
+-------------------------------------------------------------------
 Mon Jan 19 11:24:01 CET 2015 - hare@suse.de
 
 - Port to SLES11 SP4
