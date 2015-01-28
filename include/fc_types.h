@@ -25,11 +25,7 @@
  * Host-order type definitions for Fibre Channel.
  */
 
-/*
- * Note, in order for fc_wwn_t to be acceptable for %qx format strings,
- * it cannot be declared as u_int64_t.
- */
-typedef unsigned long long fc_wwn_t;	/* world-wide name */
+typedef u_int64_t           fc_wwn_t;	/* world-wide name */
 typedef u_int32_t           fc_fid_t;	/* fabric address */
 typedef u_int16_t           fc_xid_t;	/* exchange ID */
 

@@ -508,9 +508,9 @@ fp_find_hba(void)
 			fc_wwn_t wwn1;
 
 			wwn1 = fp_parse_wwn(fp_hba, "HBA", 2, 0);
-			wwn1 &= 0xffff000000000000;
+			wwn1 &= (fc_wwn_t)0xffff000000000000ULL;
 			wwn = fp_parse_wwn(&fp_hba[6], "HBA", 2, 0);
-			wwn &= 0x0000ffffffffffff;
+			wwn &= (fc_wwn_t)0x0000ffffffffffffULL;
 			wwn |= wwn1;
 		} else if (strlen(fp_hba) == strlen("aa:bb:cc:dd:ee:ff")) {
 			wwn = fp_parse_wwn(fp_hba, "HBA", 2, 0);
@@ -699,7 +699,7 @@ static int fp_lookup_target(void)
 				(response[19] & 0x0000ff);
 			return 0;
 		}
-		SA_LOG("cannot find fcid of destination @ wwpn 0x%llX",
+		SA_LOG("cannot find fcid of destination @ wwpn 0x%" PRIx64,
 		       fp_port_wwn);
 	}
 	if (fp_node_wwn != 0) {
@@ -713,7 +713,7 @@ static int fp_lookup_target(void)
 				(response[19] & 0x0000ff);
 			return 0;
 		}
-		SA_LOG("cannot find fcid of destination @ wwnn 0x%llX",
+		SA_LOG("cannot find fcid of destination @ wwnn 0x%" PRIx64,
 		       fp_node_wwn);
 	}
 	return 1;
