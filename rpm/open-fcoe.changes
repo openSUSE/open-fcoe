@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Feb 27 13:19:29 CET 2015 - hare@suse.de
+
+- Use correct program location in boot.fcoe (bsc#918629)
+
+-------------------------------------------------------------------
 Wed Jan 28 10:32:11 CET 2015 - hare@suse.de
 
 - Fixup crash in fipvlan
