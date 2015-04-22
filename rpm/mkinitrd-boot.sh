@@ -13,7 +13,7 @@ load_modules
 
 lookup_vlan_if()
 {
-    local ifname=$1
+    local ifname="$1"
     local vlan vid if
 
     IFS="| "; while read vlan vid if; do
@@ -27,7 +27,7 @@ lookup_vlan_if()
 
 lookup_fcoe_host()
 {
-    local ifname=$1
+    local ifname="$1"
     local h
 
     for h in /sys/class/fc_host/host* ; do
@@ -43,19 +43,23 @@ lookup_fcoe_host()
 
 wait_for_fcoe_if()
 {
-    local if_list=$1
+    local if_list="$1"
     local host vif
     local retry_count=$udev_timeout
     local retry vif_down vif_offline
     local vif_down_old vif_offline_old
 
-    if [ -z "if_list" ] ; then
+    if [ -z "$if_list" ] ; then
 	echo "No FCoE interfaces"
 	return
     fi
     echo "Starting FCoE on $if_list"
     sleep $fcoe_delay
-    vif_list=$(/usr/sbin/fipvlan --start --create $if_list --link-retry=$retry_count | sed -n 's/\(eth[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p')
+    vif_list="$(/usr/sbin/fipvlan --start --create $if_list \
+	--link-retry=$retry_count | \
+	sed -ne 's/\(eth[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p' \
+	    -ne 's/\(p[0-9]*p[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p' \
+	    -ne 's/\(em[0-9]*\) *| \([0-9]*\) *|.*/\1.\2/p')"
     if [ -z "$vif_list" ] ; then
 	echo "No FCoE interfaces created; dropping to /bin/sh"
 	cd /
@@ -70,8 +74,10 @@ wait_for_fcoe_if()
 	vif_down=0
 	vif_offline=0
 	for vif in $vif_list ; do
-	    if [[ $vif =~ eth[0-9]+\.0$ ]]; then
-		vif=$(echo $vif | sed -n -e 's/\(eth[0-9]\+\).0$/\1/p')
+	    if [[ $vif =~ eth[0-9]+\.0$ ]] || [[ $vif =~ p[0-9]+p[0-9]+\.0$ ]] || [[ $vif =~ em[0-9]+\.0$ ]]; then
+		vif="$(echo $vif | sed -ne 's/\(eth[0-9]\+\).0$/\1/p' \
+				       -ne 's/\(p[0-9]\+p[0-9]\+\).0$/\1/p' \
+				       -ne 's/\(em[0-9]\+\).0$/\1/p')"
 	    fi
 	    if ! ip link show $vif > /dev/null 2>&1 ; then
 		echo -n "O"
