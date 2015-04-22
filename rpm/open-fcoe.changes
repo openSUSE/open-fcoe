@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Apr 22 12:15:04 CEST 2015 - hare@suse.de
+
+- mkinitrd: Support all possible interfaces (bsc#838739)
+
+-------------------------------------------------------------------
 Fri Feb 27 13:19:29 CET 2015 - hare@suse.de
 
 - Use correct program location in boot.fcoe (bsc#918629)
