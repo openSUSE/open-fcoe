@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon May 18 12:22:03 CEST 2015 - jthumshirn@suse.de
+
+- fcoemon: Rework daemonizing and error handling (bsc#930751)
+
+-------------------------------------------------------------------
 Wed Apr 22 12:15:04 CEST 2015 - hare@suse.de
 
 - mkinitrd: Support all possible interfaces (bsc#838739)
