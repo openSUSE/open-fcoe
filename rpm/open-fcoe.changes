@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue May 19 12:15:43 CEST 2015 - hare@suse.de
+
+- mkinitrd: Reset FCoE connection on retry (bsc#931414)
+
+-------------------------------------------------------------------
 Tue May 19 09:03:29 CEST 2015 - hare@suse.de
 
 - fipvlan: fix broken fcoe start using fipvlan (bsc#921383)
