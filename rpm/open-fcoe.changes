@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue May 19 09:03:29 CEST 2015 - hare@suse.de
+
+- fipvlan: fix broken fcoe start using fipvlan (bsc#921383)
+- fipvlan: do fipvlan only on specified interface (bsc#921383)
+
+-------------------------------------------------------------------
 Mon May 18 12:22:03 CEST 2015 - jthumshirn@suse.de
 
 - fcoemon: Rework daemonizing and error handling (bsc#930751)
