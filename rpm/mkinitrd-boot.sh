@@ -98,7 +98,20 @@ wait_for_fcoe_if()
 		found=1;
 		continue;
 	    else
-		echo -n "."
+		# There might've been a link drop during initialisation,
+		# causing initial commands to be lost. So reset the FCoE
+		# connection on each 5th retry.
+		if [ $retry_count -eq 0 ] || (( $retry_count % 5 )) ; then
+		    echo -n "."
+		else
+		    portid=$(cat /sys/class/fc_host/$host/port_id 2> /dev/null)
+		    if [ "$portid" != "0x000000" ] ; then
+			echo 1 > /sys/class/fc_host/$host/issue_lip
+			echo -n "+"
+		    else
+			echo -n "."
+		    fi
+		fi
 		vif_offline=$(($vif_offline + 1))
 	    fi
 	    retry=$(($retry + 1));
